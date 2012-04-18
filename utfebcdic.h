@@ -584,6 +584,10 @@ END_EXTERN_C
 
 #define UNI_IS_INVARIANT(c)		((c) <  0xA0)
 /* UTF-EBCDIC semantic macros - transform back into I8 and then compare */
+
+/* I (khw) don't know why this isn't simply
+#define UTF8_IS_START(c)		(NATIVE_TO_UTF(c) >= 0xA0 && NATIVE_TO_UTF(c) != 0xE0)
+*/
 #define UTF8_IS_START(c)		(NATIVE_TO_UTF(c) >= 0xA0 && (NATIVE_TO_UTF(c) & 0xE0) != 0xA0)
 #define UTF8_IS_CONTINUATION(c)		((NATIVE_TO_UTF(c) & 0xE0) == 0xA0)
 #define UTF8_IS_CONTINUED(c) 		(NATIVE_TO_UTF(c) >= 0xA0)
