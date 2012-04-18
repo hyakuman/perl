@@ -505,10 +505,10 @@ Perl_is_utf8_string_loclen(const U8 *s, STRLEN len, const U8 **ep, STRLEN *el)
 =for apidoc utf8n_to_uvuni
 
 Bottom level UTF-8 decode routine.
-Returns the code point value of the first character in the string C<s>
-which is assumed to be in UTF-8 (or UTF-EBCDIC) encoding and no longer than
-C<curlen> bytes; C<retlen> will be set to the length, in bytes, of that
-character.
+Returns the code point value of the first character in the string C<s>,
+which is assumed to be in UTF-8 (or UTF-EBCDIC) encoding, and no longer than
+C<curlen> bytes; C<*retlen> (if C<retlen> doesn't point to NULL) will be set to
+the length, in bytes, of that character.
 
 The value of C<flags> determines the behavior when C<s> does not point to a
 well-formed UTF-8 character.  If C<flags> is 0, when a malformation is found,
