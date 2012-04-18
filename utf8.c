@@ -619,16 +619,6 @@ Perl_utf8n_to_uvuni(pTHX_ const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 
 #ifdef EBCDIC
     uv = NATIVE_TO_UTF(uv);
-#else
-    if (uv == 0xfe || uv == 0xff) {
-	if (flags & (UTF8_WARN_SUPER|UTF8_WARN_FE_FF)) {
-	    sv = sv_2mortal(Perl_newSVpvf(aTHX_ "Code point beginning with byte 0x%02"UVXf" is not Unicode, and not portable", uv));
-	    flags &= ~UTF8_WARN_SUPER;	/* Only warn once on this problem */
-	}
-	if (flags & (UTF8_DISALLOW_SUPER|UTF8_DISALLOW_FE_FF)) {
-	    goto malformed;
-	}
-    }
 #endif
 
     len = UTF8SKIP(s);
@@ -697,6 +687,19 @@ Perl_utf8n_to_uvuni(pTHX_ const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 	    }
 	}
 	else if ((uv > PERL_UNICODE_MAX)) {
+
+#if defined(HAS_QUAD) && ! defined(EBCDIC)
+	    /* U+8000_0000=2**31 requires a 64-bit machine and is not representable in EBCDIC */
+	    if (uv > 0x7FFFFFF) {
+		if (flags & (UTF8_WARN_SUPER|UTF8_WARN_FE_FF)) {
+		    sv = sv_2mortal(Perl_newSVpvf(aTHX_ "Code point U+%"UVXf" is not Unicode, and not portable", uv));
+		    flags &= ~UTF8_WARN_SUPER;	/* Only warn once on this problem */
+		}
+		if (flags & (UTF8_DISALLOW_SUPER|UTF8_DISALLOW_FE_FF)) {
+		    goto malformed;
+		}
+	    }
+#endif
 	    if ((flags & (UTF8_WARN_SUPER|UTF8_CHECK_ONLY)) == UTF8_WARN_SUPER) {
 		sv = sv_2mortal(Perl_newSVpvf(aTHX_ "Code point 0x%04"UVXf" is not Unicode, may not be portable", uv));
 	    }
