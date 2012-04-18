@@ -835,6 +835,8 @@ sub _fresh_perl {
 	$pass = is($results, $expect, $name);
     } elsif ($action eq '=~') {
 	$pass = like($results, $expect, $name);
+    } elsif ($action eq '!~') {
+	$pass = unlike($results, $expect, $name);
     } else {
 	die "_fresh_perl can't process action '$action'";
     }
@@ -874,6 +876,18 @@ sub fresh_perl_like {
     my($prog, $expected, $runperl_args, $name) = @_;
     local $Level = 2;
     _fresh_perl($prog, '=~', $expected, $runperl_args, $name);
+}
+
+#
+# fresh_perl_unlike
+#
+# Combination of run_perl() and unlike().
+#
+
+sub fresh_perl_unlike {
+    my($prog, $expected, $runperl_args, $name) = @_;
+    local $Level = 2;
+    _fresh_perl($prog, '!~', $expected, $runperl_args, $name);
 }
 
 # Many tests use the same format in __DATA__ or external files to specify a
