@@ -645,7 +645,7 @@ Perl_utf8n_to_uvuni(pTHX_ const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 	    if (retlen) {
 		*retlen = 1;
 	    }
-	    return *s;
+	    return UNICODE_REPLACEMENT;
 	}
 
 	warning = UTF8_WARN_CONTINUATION;
@@ -683,6 +683,7 @@ Perl_utf8n_to_uvuni(pTHX_ const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 	    if (!(flags & UTF8_ALLOW_NON_CONTINUATION)) {
 		warning = UTF8_WARN_NON_CONTINUATION;
 	    }
+	    uv = UNICODE_REPLACEMENT;
 	    break;
 	}
 
@@ -726,13 +727,21 @@ Perl_utf8n_to_uvuni(pTHX_ const U8 *s, STRLEN curlen, STRLEN *retlen, U32 flags)
 	if (! (flags & UTF8_ALLOW_SHORT)) {
 	    warning = UTF8_WARN_SHORT;
 	}
+	else {
+	    /* Could just as easily remove this from the 'else'.  Is immaterial
+	     * as malformed ignores 'uv' */
+	    uv = UNICODE_REPLACEMENT;
+	}
     }
 
     if (warning) {
 	goto malformed;
     }
 
-    /* The overlong malformation has lower precedence than the others.
+    /* The overlong malformation has lower precedence than the others.  Note
+     * that if this malformation is allowed, we return the actual value,
+     * instead of the replacement character.  This is because this value is
+     * actually well-defined. */
     if (expectlen > (STRLEN)UNISKIP(uv) && ! (flags & UTF8_ALLOW_LONG)) {
 
 	warning = UTF8_WARN_LONG;
