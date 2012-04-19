@@ -11,7 +11,7 @@ BEGIN {
 use utf8;
 use open qw( :utf8 :std );
 use warnings;
-use feature qw 'unicode_strings evalbytes';
+use feature qw 'unicode_strings evalbytes unicode_eval';
 
 use charnames qw( :full );
 
