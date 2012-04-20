@@ -1553,7 +1553,7 @@ foreach my $filename (@files) {
         my $parsed_for_links = ", but parsed for its interior links";
         if ((! $do_upstream_cpan && $filename =~ /^cpan/)
              || $filename =~ $only_for_interior_links_re)
-        {
+        {{
             if ($filename =~ /^cpan/) {
                 $checker->set_skip("CPAN is upstream for $filename");
             }
@@ -1564,13 +1564,15 @@ foreach my $filename (@files) {
                 $checker->set_skip("$filename dependent on component pods");
             }
             else {
-                croak("Unexpected file '$filename' encountered that has parsing for interior-linking only");
+                # File specified explicitly on the command line.
+                # Don’t skip it.
+                last;
             }
 
             if ($name && $has_referred_to_node{$name}) {
                 $checker->set_skip($checker->get_skip() . $parsed_for_links);
             }
-        }
+        }}
 
         # Need a name in order to process it, because not meaningful
         # otherwise, and also can't test links to this without a name.
